@@ -1,0 +1,165 @@
+{
+  "info": {
+    "name": "Sentiment Pipeline API",
+    "description": "API collection for the High-Throughput NLP Sentiment Pipeline. Fine-tuned DistilBERT on Amazon reviews.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "sentiment-pipeline-v1"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        },
+        "description": "Check that the API and model are loaded and ready."
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "status": "OK",
+          "code": 200,
+          "body": "{\"status\": \"ok\", \"model\": \"distilbert-int8\", \"version\": \"1.0.0\"}"
+        }
+      ]
+    },
+    {
+      "name": "Predict — Positive review",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"This product is absolutely amazing! Best purchase I have ever made. Highly recommend to everyone.\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/predict",
+          "host": ["{{base_url}}"],
+          "path": ["predict"]
+        },
+        "description": "Predict sentiment for a single review. Expected: positive."
+      },
+      "response": [
+        {
+          "name": "200 OK — Positive",
+          "status": "OK",
+          "code": 200,
+          "body": "{\"sentiment\": \"positive\", \"label\": 2, \"confidence\": 0.974, \"latency_ms\": 24.3}"
+        }
+      ]
+    },
+    {
+      "name": "Predict — Negative review",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"Complete waste of money. Broke after one day, terrible quality.\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/predict",
+          "host": ["{{base_url}}"],
+          "path": ["predict"]
+        },
+        "description": "Predict sentiment for a negative review."
+      },
+      "response": [
+        {
+          "name": "200 OK — Negative",
+          "status": "OK",
+          "code": 200,
+          "body": "{\"sentiment\": \"negative\", \"label\": 0, \"confidence\": 0.987, \"latency_ms\": 21.8}"
+        }
+      ]
+    },
+    {
+      "name": "Predict — Neutral review",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"It was okay. Nothing special, does the job I guess.\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/predict",
+          "host": ["{{base_url}}"],
+          "path": ["predict"]
+        },
+        "description": "Predict sentiment for a neutral review."
+      }
+    },
+    {
+      "name": "Batch Predict — Mixed reviews",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"texts\": [\n    \"This product is absolutely amazing, best purchase ever!\",\n    \"Complete waste of money, broke after one day.\",\n    \"It was okay, nothing special really.\",\n    \"Exceeded all my expectations, will buy again!\",\n    \"Very disappointed, does not match description at all.\"\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/batch",
+          "host": ["{{base_url}}"],
+          "path": ["batch"]
+        },
+        "description": "Classify a batch of 5 reviews in one request."
+      },
+      "response": [
+        {
+          "name": "200 OK — Batch results",
+          "status": "OK",
+          "code": 200,
+          "body": "{\"results\": [{\"sentiment\": \"positive\", \"label\": 2, \"confidence\": 0.961}, {\"sentiment\": \"negative\", \"label\": 0, \"confidence\": 0.987}, {\"sentiment\": \"neutral\", \"label\": 1, \"confidence\": 0.843}, {\"sentiment\": \"positive\", \"label\": 2, \"confidence\": 0.979}, {\"sentiment\": \"negative\", \"label\": 0, \"confidence\": 0.952}], \"total\": 5, \"latency_ms\": 71.2}"
+        }
+      ]
+    },
+    {
+      "name": "Predict — Empty text (validation error)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/predict",
+          "host": ["{{base_url}}"],
+          "path": ["predict"]
+        },
+        "description": "Test input validation — empty text should return 422."
+      },
+      "response": [
+        {
+          "name": "422 Unprocessable Entity",
+          "status": "Unprocessable Entity",
+          "code": 422,
+          "body": "{\"detail\": [{\"type\": \"string_too_short\", \"loc\": [\"body\", \"text\"], \"msg\": \"String should have at least 1 character\"}]}"
+        }
+      ]
+    }
+  ]
+}
