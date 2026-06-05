@@ -1,10 +1,3 @@
-"""
-dataset.py
-----------
-PyTorch Dataset class for Amazon customer reviews.
-Handles tokenization, label mapping, and DataLoader creation.
-"""
-
 import torch
 from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
 from transformers import DistilBertTokenizerFast
@@ -21,10 +14,6 @@ MAX_LEN = 256
 
 
 def load_amazon_reviews(n_samples: int = 50000, seed: int = 42) -> pd.DataFrame:
-    """
-    Load Amazon Reviews 2023 dataset from Hugging Face Hub.
-    Returns a balanced DataFrame with 'text' and 'label' columns.
-    """
     print("Loading dataset from Hugging Face Hub...")
     dataset = load_dataset(
         "McAuley-Lab/Amazon-Reviews-2023",
@@ -36,7 +25,6 @@ def load_amazon_reviews(n_samples: int = 50000, seed: int = 42) -> pd.DataFrame:
     df["label"] = df["rating"].astype(int).map(LABEL_MAP)
     df = df.dropna(subset=["label"]).astype({"label": int})
 
-    # Stratified sample
     df = (
         df.groupby("label", group_keys=False)
         .apply(lambda x: x.sample(min(len(x), n_samples // 3), random_state=seed))
@@ -48,24 +36,12 @@ def load_amazon_reviews(n_samples: int = 50000, seed: int = 42) -> pd.DataFrame:
 
 
 def clean_text(text: str) -> str:
-    """Basic text cleaning: strip whitespace and truncate very long strings."""
     import re
-    text = re.sub(r"<[^>]+>", " ", text)       # remove HTML tags
-    text = re.sub(r"\s+", " ", text).strip()    # collapse whitespace
-    return text[:2000]                           # cap at 2000 chars before tokenization
-
-
+    text = re.sub(r"<[^>]+>", " ", text)      
+    text = re.sub(r"\s+", " ", text).strip()    
+    return text[:2000]                           
 class ReviewDataset(Dataset):
-    """
-    PyTorch Dataset for sentiment classification.
-
-    Args:
-        texts  (list[str]): Raw review texts.
-        labels (list[int]): Sentiment labels (0=neg, 1=neu, 2=pos).
-        tokenizer: Hugging Face tokenizer instance.
-        max_len (int): Maximum token sequence length.
-    """
-
+   
     def __init__(self, texts: list, labels: list, tokenizer, max_len: int = MAX_LEN):
         cleaned = [clean_text(t) for t in texts]
         self.encodings = tokenizer(
@@ -87,7 +63,6 @@ class ReviewDataset(Dataset):
 
 
 def make_weighted_sampler(labels: list) -> WeightedRandomSampler:
-    """Create a WeightedRandomSampler to handle class imbalance."""
     counts = Counter(labels)
     weights = [1.0 / counts[l] for l in labels]
     return WeightedRandomSampler(weights, num_samples=len(weights), replacement=True)
@@ -101,12 +76,7 @@ def get_dataloaders(
     test_split: float = 0.1,
     seed: int = 42,
 ) -> tuple:
-    """
-    Split DataFrame and return train/val/test DataLoaders.
 
-    Returns:
-        (train_loader, val_loader, test_loader)
-    """
     from sklearn.model_selection import train_test_split
 
     texts = df["text"].tolist()

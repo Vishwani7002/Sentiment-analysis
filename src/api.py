@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 from transformers import DistilBertForSequenceClassification, DistilBertTokenizerFast
 from torch.quantization import quantize_dynamic
 
-# ─── Config ───────────────────────────────────────────────────────────────────
+ 
 SAVE_DIR    = "models"
 MODEL_NAME  = "distilbert-base-uncased"
 NUM_LABELS  = 3
@@ -17,14 +17,11 @@ MAX_LEN     = 256
 BATCH_CHUNK = 32  # process batch in chunks of this size
 LABEL_NAMES = {0: "negative", 1: "neutral", 2: "positive"}
 
-# Global model state
 model_state = {}
 
 
-# ─── Startup / shutdown ───────────────────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Load model once at startup, release on shutdown."""
     print("Loading model and tokenizer...")
 
     tokenizer_path = os.path.join(SAVE_DIR, "tokenizer")
@@ -41,7 +38,6 @@ async def lifespan(app: FastAPI):
         base_model.load_state_dict(torch.load(model_path, map_location="cpu"))
         print(f"Loaded checkpoint from {model_path}")
 
-    # Apply quantization for faster CPU inference
     model = quantize_dynamic(base_model, {torch.nn.Linear}, dtype=torch.qint8)
     model.eval()
 
@@ -52,16 +48,12 @@ async def lifespan(app: FastAPI):
     model_state.clear()
 
 
-# ─── App ──────────────────────────────────────────────────────────────────────
 app = FastAPI(
     title="Sentiment Analysis API",
     description="Fine-tuned DistilBERT for Amazon review sentiment classification.",
     version="1.0.0",
     lifespan=lifespan,
 )
-
-
-# ─── Schemas ──────────────────────────────────────────────────────────────────
 class SingleRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=5000,
                       example="This product is absolutely amazing!")
@@ -82,12 +74,8 @@ class BatchResponse(BaseModel):
     latency_ms: float
 
 
-# ─── Inference helpers ────────────────────────────────────────────────────────
+
 def run_inference(texts: list) -> list:
-    """
-    Run inference on a list of texts in chunks.
-    Returns list of (label_idx, confidence) tuples.
-    """
     model     = model_state["model"]
     tokenizer = model_state["tokenizer"]
     results   = []
@@ -112,7 +100,6 @@ def run_inference(texts: list) -> list:
     return results
 
 
-# ─── Endpoints ────────────────────────────────────────────────────────────────
 @app.get("/health", tags=["System"])
 def health():
     """Health check endpoint for load balancers."""
@@ -125,12 +112,6 @@ def health():
 
 @app.post("/predict", response_model=PredictionResult, tags=["Inference"])
 def predict(req: SingleRequest):
-    """
-    Predict sentiment for a single review text.
-
-    Returns sentiment label (positive/neutral/negative),
-    predicted class index, and confidence score.
-    """
     if "model" not in model_state:
         raise HTTPException(status_code=503, detail="Model not loaded")
 
@@ -148,12 +129,6 @@ def predict(req: SingleRequest):
 
 @app.post("/batch", response_model=BatchResponse, tags=["Inference"])
 def batch_predict(req: BatchRequest):
-    """
-    Predict sentiment for a batch of review texts.
-
-    Processes up to 500 texts per request in chunks of 32.
-    Returns individual predictions and total batch latency.
-    """
     if "model" not in model_state:
         raise HTTPException(status_code=503, detail="Model not loaded")
 

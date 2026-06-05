@@ -1,13 +1,3 @@
-"""
-evaluate.py
------------
-Evaluation utilities: F1, accuracy, confusion matrix, and per-class report.
-Can be run standalone to evaluate a saved checkpoint on the test set.
-
-Usage:
-    python src/evaluate.py
-"""
-
 import os
 import torch
 import numpy as np

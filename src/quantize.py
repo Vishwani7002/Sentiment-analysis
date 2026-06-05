@@ -1,13 +1,3 @@
-"""
-quantize.py
------------
-Applies dynamic INT8 quantization to the fine-tuned DistilBERT model.
-Benchmarks latency and F1 score before vs after quantization.
-
-Usage:
-    python src/quantize.py
-"""
-
 import os
 import time
 import torch
@@ -42,7 +32,6 @@ def apply_quantization(model) -> torch.nn.Module:
 
 
 def get_model_size_mb(model) -> float:
-    """Save model temporarily and measure file size in MB."""
     tmp_path = os.path.join(SAVE_DIR, "_tmp_size_check.pt")
     torch.save(model.state_dict(), tmp_path)
     size_mb = os.path.getsize(tmp_path) / 1e6
@@ -51,10 +40,6 @@ def get_model_size_mb(model) -> float:
 
 
 def benchmark_latency(model, tokenizer, texts: list, n_runs: int = 100) -> dict:
-    """
-    Measure inference latency across n_runs samples.
-    Returns p50 and p95 latency in milliseconds.
-    """
     latencies = []
     for text in texts[:n_runs]:
         enc = tokenizer(text, return_tensors="pt", truncation=True,
@@ -95,24 +80,22 @@ def main():
     print("Applying dynamic INT8 quantization...")
     int8_model = apply_quantization(fp32_model)
 
-    # ── Size comparison ─────────────────────────────────────────────────────
     fp32_size = get_model_size_mb(fp32_model)
     int8_size = get_model_size_mb(int8_model)
     reduction = (1 - int8_size / fp32_size) * 100
 
-    print("\n── Model Size ────────────────────────────────────────")
+    print("\nModel Size")
     print(f"  FP32 model: {fp32_size:.1f} MB")
     print(f"  INT8 model: {int8_size:.1f} MB")
     print(f"  Reduction:  {reduction:.1f}%")
 
-    # ── Latency benchmark ────────────────────────────────────────────────────
     sample_texts = [
         "This product is absolutely amazing, best purchase ever!",
         "Complete waste of money, broke after one day.",
         "It was okay, nothing special really.",
         "Exceeded my expectations in every way.",
         "Would not recommend, very disappointing quality.",
-    ] * 20  # 100 samples total
+    ] * 20  
 
     print("\n── Latency Benchmark (100 samples) ─────────────────")
     fp32_lat = benchmark_latency(fp32_model, tokenizer, sample_texts)
@@ -122,7 +105,6 @@ def main():
     print(f"  INT8 → p50: {int8_lat['p50_ms']} ms | p95: {int8_lat['p95_ms']} ms")
     print(f"  Speedup: {fp32_lat['p50_ms'] / int8_lat['p50_ms']:.2f}x")
 
-    # ── Save INT8 model ──────────────────────────────────────────────────────
     int8_path = os.path.join(SAVE_DIR, "model_int8.pt")
     torch.save(int8_model.state_dict(), int8_path)
     print(f"\n✓ Saved INT8 model → {int8_path}")

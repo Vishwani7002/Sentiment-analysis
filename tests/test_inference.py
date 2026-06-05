@@ -1,10 +1,3 @@
-"""
-test_inference.py
------------------
-Unit tests for model inference via the FastAPI endpoints.
-Run with: pytest tests/ -v
-"""
-
 import pytest
 from fastapi.testclient import TestClient
 import sys
@@ -12,16 +5,12 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../src"))
 
 
-# ─── We test the API logic directly without a live model ─────────────────────
-# (model_state is mocked so tests run without GPU or checkpoint files)
-
 from unittest.mock import patch, MagicMock
 import torch
 
 
 @pytest.fixture
 def mock_model_state():
-    """Provide a mock model and tokenizer for tests."""
     mock_tokenizer = MagicMock()
     mock_tokenizer.return_value = {
         "input_ids":      torch.zeros(1, 256, dtype=torch.long),
@@ -39,7 +28,6 @@ def mock_model_state():
 
 
 def test_predict_returns_valid_sentiment(mock_model_state):
-    """POST /predict should return a valid sentiment label."""
     with patch("api.model_state", mock_model_state):
         from src.api import app
         client = TestClient(app)
@@ -53,7 +41,6 @@ def test_predict_returns_valid_sentiment(mock_model_state):
 
 
 def test_predict_returns_positive_for_positive_text(mock_model_state):
-    """Positive logits should map to 'positive' sentiment."""
     with patch("api.model_state", mock_model_state):
         from src.api import app
         client = TestClient(app)
@@ -64,7 +51,6 @@ def test_predict_returns_positive_for_positive_text(mock_model_state):
 
 
 def test_batch_predict_returns_list(mock_model_state):
-    """POST /batch should return a list of results matching input length."""
     texts = ["Great!", "Terrible.", "It was okay."]
     with patch("api.model_state", mock_model_state):
         from src.api import app
@@ -78,7 +64,6 @@ def test_batch_predict_returns_list(mock_model_state):
 
 
 def test_health_endpoint():
-    """GET /health should return status ok."""
     from src.api import app
     client = TestClient(app)
     response = client.get("/health")
@@ -87,7 +72,6 @@ def test_health_endpoint():
 
 
 def test_predict_rejects_empty_text(mock_model_state):
-    """POST /predict with empty text should return 422."""
     with patch("api.model_state", mock_model_state):
         from src.api import app
         client = TestClient(app)
@@ -97,7 +81,6 @@ def test_predict_rejects_empty_text(mock_model_state):
 
 
 def test_predict_rejects_missing_text(mock_model_state):
-    """POST /predict with no text field should return 422."""
     with patch("api.model_state", mock_model_state):
         from src.api import app
         client = TestClient(app)

@@ -1,10 +1,3 @@
-"""
-test_dataset.py
----------------
-Unit tests for the ReviewDataset class and helper functions.
-Run with: pytest tests/ -v
-"""
-
 import pytest
 import torch
 import sys, os
@@ -14,7 +7,6 @@ from unittest.mock import patch, MagicMock
 from dataset import ReviewDataset, clean_text, make_weighted_sampler, LABEL_MAP
 
 
-# ─── clean_text ───────────────────────────────────────────────────────────────
 
 def test_clean_text_removes_html():
     result = clean_text("<b>Great product</b>!")
@@ -33,7 +25,6 @@ def test_clean_text_truncates_long_strings():
     assert len(result) <= 2000
 
 
-# ─── LABEL_MAP ────────────────────────────────────────────────────────────────
 
 def test_label_map_covers_all_ratings():
     for star in [1, 2, 3, 4, 5]:
@@ -54,7 +45,6 @@ def test_label_map_positive():
     assert LABEL_MAP[5] == 2
 
 
-# ─── ReviewDataset ────────────────────────────────────────────────────────────
 
 @pytest.fixture
 def mock_tokenizer():
@@ -89,7 +79,6 @@ def test_dataset_item_has_required_keys(mock_tokenizer):
     assert "labels" in item
 
 
-# ─── make_weighted_sampler ────────────────────────────────────────────────────
 
 def test_weighted_sampler_length():
     labels = [0, 0, 0, 1, 2, 2]

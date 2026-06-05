@@ -1,13 +1,3 @@
-"""
-train.py
---------
-Fine-tunes DistilBERT on Amazon reviews for 3-class sentiment classification.
-Saves the best checkpoint (by val F1) to models/best_model.pt.
-
-Usage:
-    python src/train.py
-"""
-
 import os
 import time
 import torch
@@ -22,7 +12,6 @@ from torch.optim import AdamW
 
 from dataset import load_amazon_reviews, get_dataloaders, LABEL_NAMES, MODEL_NAME
 
-# ─── Config ───────────────────────────────────────────────────────────────────
 EPOCHS       = 3
 BATCH_SIZE   = 32
 LR           = 2e-5
@@ -105,7 +94,6 @@ def main():
     )
     model.to(DEVICE)
 
-    # Optimizer + scheduler
     optimizer = AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
     total_steps = len(train_loader) * EPOCHS
     scheduler = get_linear_schedule_with_warmup(
@@ -139,7 +127,6 @@ def main():
             torch.save(model.state_dict(), ckpt_path)
             print(f"  ✓ Saved best model (val F1={val_f1:.4f}) → {ckpt_path}")
 
-    # Final evaluation on test set
     print("\n" + "=" * 60)
     print("Evaluating on test set...")
     model.load_state_dict(torch.load(os.path.join(SAVE_DIR, "best_model.pt")))
@@ -149,7 +136,6 @@ def main():
     print("\nClassification Report:")
     print(classification_report(test_labels, test_preds, target_names=LABEL_NAMES))
 
-    # Save tokenizer alongside model
     tokenizer.save_pretrained(os.path.join(SAVE_DIR, "tokenizer"))
     print(f"\nDone. Best val F1: {best_val_f1:.4f}")
 
