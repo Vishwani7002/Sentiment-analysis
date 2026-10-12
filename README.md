@@ -215,6 +215,6 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ## 🙋 Author
 
-Built as part of Amazon ML Summer School application portfolio.
+Built by Vishwani Venishetty
 
 > *"Fine-tuned DistilBERT on 50k+ Amazon reviews · 92.4% F1 · 40% model compression via INT8 quantization · FastAPI REST endpoint"*
