@@ -5,8 +5,6 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [1.0.0] — 2025-06
-
 ### Added
 - Fine-tuned DistilBERT on 50,247 Amazon reviews for 3-class sentiment classification
 - Dynamic INT8 quantization with 40% model size reduction and <0.5% F1 degradation
