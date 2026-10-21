@@ -77,8 +77,8 @@ sentiment-pipeline/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/sentiment-pipeline.git
-cd sentiment-pipeline
+git clone https://github.com/Vishwani7002/Sentiment-analysis.git
+cd Sentiment-analysis
 ```
 
 ### 2. Create and activate virtual environment
