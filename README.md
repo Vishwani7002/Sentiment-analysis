@@ -10,7 +10,7 @@ Fine-tuned **DistilBERT** sentiment classifier on **50,000+ Amazon customer revi
 
 ---
 
-## 📊 Results
+##  Results
 
 | Metric | Value |
 |---|---|
@@ -27,7 +27,7 @@ Fine-tuned **DistilBERT** sentiment classifier on **50,000+ Amazon customer revi
 
 ---
 
-## 🧠 What This Project Does
+##  What This Project Does
 
 ```
 Amazon Reviews Dataset (50k+)
@@ -47,7 +47,7 @@ Amazon Reviews Dataset (50k+)
 
 ---
 
-## 🗂️ Project Structure
+##  Project Structure
 
 ```
 sentiment-pipeline/
@@ -72,7 +72,7 @@ sentiment-pipeline/
 
 ---
 
-## ⚡ Quick Start
+##  Quick Start
 
 ### 1. Clone the repository
 
@@ -123,7 +123,7 @@ API docs available at: `http://localhost:8000/docs`
 
 ---
 
-## 🔌 API Endpoints
+##  API Endpoints
 
 ### `POST /predict` — Single review
 
@@ -172,7 +172,7 @@ curl -X POST http://localhost:8000/batch \
 
 ---
 
-## 🧪 Running Tests
+##  Running Tests
 
 ```bash
 pytest tests/ -v
@@ -180,7 +180,7 @@ pytest tests/ -v
 
 ---
 
-## 📦 Tech Stack
+##  Tech Stack
 
 | Component | Technology |
 |---|---|
@@ -195,7 +195,7 @@ pytest tests/ -v
 
 ---
 
-## 📈 Training Details
+##  Training Details
 
 - **Base model:** `distilbert-base-uncased` (66M parameters)
 - **Optimizer:** AdamW (lr=2e-5, weight_decay=0.01)
@@ -207,13 +207,13 @@ pytest tests/ -v
 
 ---
 
-## 📝 License
+##  License
 
 MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
-## 🙋 Author
+##  Author
 
 Built by Vishwani Venishetty
 
