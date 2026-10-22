@@ -1,4 +1,4 @@
-# 🔍 High-Throughput NLP Sentiment Pipeline
+# High-Throughput NLP Sentiment Pipeline
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white)](https://python.org)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.3-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org)
